@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Identity Shifting</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--tx:#1f2430;--mut:#6b7280;--ac:#2f7d5b;--red:#d1242f;--bd:#e5e0d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181d;--card:#1e232b;--tx:#eceff4;--mut:#9aa3b2;--ac:#4fb98a;--red:#ff6b6b;--bd:#2d343f}}
+:root[data-theme="dark"]{--bg:#15181d;--card:#1e232b;--tx:#eceff4;--mut:#9aa3b2;--ac:#4fb98a;--red:#ff6b6b;--bd:#2d343f}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.5rem;margin:.2em 0}h2{font-size:1.2rem;margin:0 0 .3em}
+.sub{color:var(--mut);margin:0 0 16px}
+.steps{display:flex;gap:6px;margin:14px 0 18px}
+.steps button{flex:1;padding:8px 0;border:1px solid var(--bd);background:var(--card);color:var(--mut);border-radius:10px;font-weight:600;cursor:pointer}
+.steps button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:14px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+textarea,input[type=text]{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+textarea{min-height:64px;resize:vertical}
+.btn{background:var(--ac);color:#fff;border:0;padding:11px 18px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer;margin-top:12px}
+.btn.ghost{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.row{display:flex;gap:8px;align-items:center}.row input{flex:1}
+.old{cursor:pointer;padding:10px 12px;border:1px dashed var(--bd);border-radius:10px;margin:8px 0;position:relative;display:flex;justify-content:space-between;gap:8px}
+.old .t{position:relative;display:inline-block}
+.old .t::after{content:"";position:absolute;left:-3px;top:52%;height:3px;width:0;background:var(--red);border-radius:2px;transition:width .5s}
+.old.cut .t::after{width:calc(100% + 6px)}
+.old.cut{color:var(--mut)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pair div{padding:10px;border-radius:10px;border:1px solid var(--bd);margin:6px 0}
+.pair .o{color:var(--red);text-decoration:line-through;text-decoration-thickness:2px}
+.pair .n{color:var(--ac);font-weight:700;border-color:var(--ac)}
+.big{font-size:2.2rem;font-weight:800;color:var(--ac);line-height:1}
+.stats{display:flex;gap:12px}.stats>div{flex:1;text-align:center;padding:10px;border:1px solid var(--bd);border-radius:12px}
+.stats small{color:var(--mut);display:block}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px}
+.grid span{aspect-ratio:1;border-radius:6px;background:var(--bd);font-size:.7rem;display:flex;align-items:center;justify-content:center;color:var(--mut)}
+.grid span.d{background:var(--ac);color:#fff}
+.hb{border:1px solid var(--bd);border-radius:12px;padding:12px;margin:12px 0}.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.chips button{border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:20px;padding:5px 11px;cursor:pointer;font:inherit;font-size:.85rem}.note{font-size:.9rem;color:var(--mut);margin-top:10px}
+.hide{display:none}
+</style></head><body><main>
+<h1>🔥 Identity Shifting</h1><p class="sub" style="margin-top:-6px;font-weight:600">Cut the old identity. Become the new you. Prove it daily.</p>
+<p class="sub">For any part of life: gym, study, coding, job search, sleep, money, anything. Change who you believe you are, then prove it with small actions.</p>
+<div class="steps" id="steps"></div>
+<div id="view"></div><p class="note" style="text-align:center;margin-top:24px">Built on cognitive restructuring, identity-based habits and implementation intentions. This is a self-help tool, not therapy. If low mood or hopelessness lasts for weeks, please talk to a doctor or counselor.</p>
+</main>
+<script>
+var KEY="reforge.v1";
+var S={step:0,area:"",q:["","","",""],old:["I am weak","I am lazy","I have no discipline","I am not consistent"],neu:["I am strong","I am hard-working","I am disciplined","I am consistent"],cut:[],reads:0,why:"",proof:"",bel:{o:8,n:3},log:[],habits:[]};
+try{var raw=localStorage.getItem(KEY)||localStorage.getItem("identityShift.v2")||localStorage.getItem("identityShift.v1");if(raw){var p=JSON.parse(raw);for(var k in p)S[k]=p[k];}
+ if(p&&p.action&&!(p.habits&&p.habits.length))S.habits=[{name:p.action,min:p.min||"",days:p.days||[]}];}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function key(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function today(){return key(new Date())}
+function go(n){S.step=n;save();render();window.scrollTo(0,0)}
+function streak(h){var n=0,d=new Date();if(h.days.indexOf(today())<0)d.setDate(d.getDate()-1);while(h.days.indexOf(key(d))>=0){n++;d.setDate(d.getDate()-1)}return n}
+var QS=["Where did I first learn this story about myself (family, school, a past failure)?","What do I gain from staying this way (comfort, safety from failure or judgment)?","What has this identity cost me so far?","Exceptions: when did I act against this story, even once? What was different?"];
+var AREAS=["Gym / health","Study","Coding","Job search","Sleep","Money","Reading","Other"];
+var EX=["Walk 10 minutes","Study 20 minutes","Code 30 minutes","Apply to 2 jobs","Sleep by 11 PM","Read 5 pages"];
+function render(){
+ var st=document.getElementById("steps"),names=["1 Aware","2 New","3 Cut","4 Shift","5 Act"];
+ st.innerHTML=names.map(function(n,i){return '<button class="'+(i===S.step?"on":"")+'" onclick="go('+i+')">'+n+'</button>'}).join("");
+ var v=document.getElementById("view"),h="";
+ if(S.step===0){
+  h='<div class="card"><h2>Step 1: Become aware of the old identity</h2><p class="sub">Answer honestly and kindly. This story was learned, not born with you. Learned beliefs can be unlearned. You are the observer of the thought, not the thought itself.</p>';
+  h+='<label>Which area do you want to change? (anything)</label><input type="text" placeholder="e.g. Study, coding, gym, job search" value="'+esc(S.area)+'" oninput="S.area=this.value;save()"><div class="chips">'+AREAS.map(function(a){return '<button onclick="S.area=\''+a+'\';save();render()">'+a+'</button>'}).join("")+'</div>';
+  QS.forEach(function(q,i){h+='<label>'+q+'</label><textarea oninput="S.q['+i+']=this.value;save()">'+esc(S.q[i]||'')+'</textarea>'});
+  h+='<label>My old identity sentences (edit freely)</label>';
+  S.old.forEach(function(o,i){h+='<div class="row" style="margin-bottom:6px"><input type="text" value="'+esc(o)+'" oninput="S.old['+i+']=this.value;save()"><button class="btn ghost" style="margin:0" onclick="delOld('+i+')">✕</button></div>'});
+  h+='<button class="btn ghost" onclick="addOld()">+ Add sentence</button><br><button class="btn" onclick="go(1)">Next: Write the opposite →</button></div>';
+ }
+ if(S.step===1){
+  h='<div class="card"><h2>Step 2: Write your new identity'+(S.area?' ('+esc(S.area)+')':'')+'</h2><p class="sub">Write the opposite of each old sentence. If it feels like a lie, begin with "I am becoming…". The mind changes faster when it can accept the sentence.</p>';
+  S.old.forEach(function(o,i){h+='<label style="color:var(--red)">'+esc(o)+'</label><input type="text" placeholder="I am…" value="'+esc(S.neu[i]||"")+'" oninput="S.neu['+i+']=this.value;save()">'});
+  h+='<label>Why does this matter to me? (my deeper values)</label><textarea oninput="S.why=this.value;save()">'+esc(S.why)+'</textarea><label>One real time I already acted like the new me (my first proof)</label><textarea oninput="S.proof=this.value;save()">'+esc(S.proof)+'</textarea><button class="btn" onclick="go(2)">Next: Cut the old →</button></div>';
+ }
+ if(S.step===2){
+  h='<div class="card"><h2>Step 3: Cut the old identity</h2><p class="sub">Take the red pen. Tap each sentence to draw a line through it. Say aloud: "This is not me anymore."</p>';
+  S.old.forEach(function(o,i){var c=S.cut.indexOf(i)>=0;h+='<div class="old'+(c?" cut":"")+'" onclick="cut('+i+')"><span class="t">'+esc(o)+'</span><span>'+(c?"✓":"🖊️")+'</span></div>'});
+  h+='<button class="btn" onclick="go(3)">Next: Paste the new →</button></div>';
+ }
+ if(S.step===3){
+  h='<div class="card"><h2>Step 4: Read your new identity</h2><p class="sub">Old is crossed out. Read the green side aloud slowly, once each morning.</p><div class="pair"><div style="border:0;padding:0;margin:0">';
+  S.old.forEach(function(o){h+='<div class="o">'+esc(o)+'</div>'});
+  h+='</div><div style="border:0;padding:0;margin:0">';
+  S.old.forEach(function(o,i){h+='<div class="n">'+esc(S.neu[i]||"…")+'</div>'});
+  h+='</div></div><label>How much do I believe the OLD identity right now? <b id="vo">'+S.bel.o+'</b>/10</label><input type="range" min="0" max="10" value="'+S.bel.o+'" oninput="S.bel.o=+this.value;document.getElementById(\'vo\').textContent=this.value;save()"><label>How much do I believe the NEW identity right now? <b id="vn">'+S.bel.n+'</b>/10</label><input type="range" min="0" max="10" value="'+S.bel.n+'" oninput="S.bel.n=+this.value;document.getElementById(\'vn\').textContent=this.value;save()"><p class="note">Re-rate weekly. Belief in the new identity rises as your proof grows. Slow rises are normal.</p>'+(S.why?'<p class="note"><b>My why:</b> '+esc(S.why)+'</p>':'')+'<p class="note">Times read aloud: <b>'+S.reads+'</b></p><button class="btn" onclick="S.reads++;save();render()">✓ I read it aloud</button> <button class="btn ghost" onclick="go(4)">Next: Take action →</button></div>';
+ }
+ if(S.step===4){
+  var tot=0;S.habits.forEach(function(x){tot+=x.days.length});
+  h='<div class="card"><h2>Step 5: Act like the new you</h2><p class="sub">Add any actions you like, for any area of life. Keep each one so small you cannot say no. Every tap is proof for your new identity.</p>';
+  h+='<div class="row"><input type="text" id="nh" placeholder="My action, e.g. Study 20 minutes"><button class="btn" style="margin:0" onclick="addH()">Add</button></div><div class="chips">'+EX.map(function(e){return '<button onclick="addH(\''+e+'\')">'+e+'</button>'}).join("")+'</div></div>';
+  S.habits.forEach(function(x,i){
+   var done=x.days.indexOf(today())>=0;
+   h+='<div class="card"><div class="row"><b style="flex:1">'+esc(x.name)+'</b><button class="btn ghost" style="margin:0;padding:4px 10px" onclick="delH('+i+')">✕</button></div>';
+   h+='<label style="font-weight:500;font-size:.85rem">If-then plan: When and where will I do it?</label><input type="text" placeholder="After I drink my morning tea, I will…" value="'+esc(x.cue||'')+'" oninput="S.habits['+i+'].cue=this.value;save()"><label style="font-weight:500;font-size:.85rem">Minimum version for a bad day</label><input type="text" placeholder="e.g. just open the book" value="'+esc(x.min)+'" oninput="S.habits['+i+'].min=this.value;save()">';
+   h+='<button class="btn" '+(done?"disabled":"")+' onclick="mark('+i+')">'+(done?"✓ Done today":"I did it today")+'</button>';
+   h+='<div class="stats" style="margin-top:12px"><div><span class="big">'+streak(x)+'</span><small>day streak</small></div><div><span class="big">'+x.days.length+'</span><small>total votes</small></div></div><div class="grid">';
+   for(var j=13;j>=0;j--){var d=new Date();d.setDate(d.getDate()-j);h+='<span class="'+(x.days.indexOf(key(d))>=0?"d":"")+'">'+d.getDate()+'</span>'}
+   h+='</div></div>';
+  });
+  h+='<div class="card"><h2>Evidence journal</h2><p class="sub">Write one line of proof each day, however small. Your mind believes evidence, not affirmations.</p><div class="row"><input type="text" id="lg" placeholder="Today I proved I am…"><button class="btn" style="margin:0" onclick="addLog()">Save</button></div>'+S.log.slice(-5).reverse().map(function(l){return '<div class="hb" style="margin:8px 0;padding:8px">'+esc(l.t)+'<br><small style="color:var(--mut)">'+l.d+'</small></div>'}).join("")+'</div>';
+  if(!S.habits.length)h+='<p class="note">No actions yet. Add your first one above.</p>';
+  else h+='<p class="note">Total votes for the new you: <b>'+tot+'</b>. Missed a day? Never miss twice. Do the minimum version and keep going.</p>';
+ }
+ v.innerHTML=h;
+}
+function addOld(){S.old.push("");S.neu.push("");save();render()}
+function delOld(i){S.old.splice(i,1);S.neu.splice(i,1);S.cut=[];save();render()}
+function cut(i){if(S.cut.indexOf(i)<0)S.cut.push(i);save();render()}
+function addH(n){var el=document.getElementById("nh");n=n||(el&&el.value.trim());if(!n)return;S.habits.push({name:n,min:"",cue:"",days:[]});save();render()}
+function addLog(){var el=document.getElementById('lg'),t=el&&el.value.trim();if(!t)return;S.log.push({t:t,d:today()});save();render()}
+function delH(i){S.habits.splice(i,1);save();render()}
+function mark(i){var x=S.habits[i];if(x.days.indexOf(today())<0)x.days.push(today());save();render()}
+render();
+</script></body></html>
